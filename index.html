@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset=utf-8 />
+	<title>Linville_Railway</title>
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+	<link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background: "whitesmoke";
+			font-family: "Courier New", Courier, monospace;
+			color: #003E61;
+		}
+
+		h1 {
+			position: absolute;
+			margin-top: 0;
+			top: 10px;
+			left: 60px;
+			font-size: 2em;
+			font-family: "Courier New", Courier, monospace;
+			letter-spacing: .02em;
+			padding: 10px 15px;
+			background: rgba(256, 256, 256);
+			border: 1px solid grey;
+			border-radius: 10px;
+			z-index: 800;
+		}
+
+		h2 {
+			font-family: "Courier New", Courier, monospace;
+			letter-spacing: .04em;
+		}
+
+		#map {
+			position: absolute;
+			top: 0;
+			left: 0px;
+			bottom: 0;
+			width: 125%;
+		}
+
+		section {
+			position: absolute;
+			bottom: 0;
+			left: 20px;
+			width: 280px;
+			margin: 20px auto;
+			padding: 0 15px;
+			background: rgba(256, 256, 256);
+			border: 1px solid grey;
+			border-radius: 10px;
+			z-index: 800;
+		}
+
+		p {
+			font-size: .68em;
+			line-height: 1.5em;
+		}
+
+		a {
+			color: #005daa;
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>The Linville Railway</h1>
+
+	<div id='map'></div>
+
+	<section>
+		<h2>About This Map</h2>
+
+		<p>The Linville Railway was an extension of the Eastern Tenessee & Western North Carolina Railroad. It was built in 1918 between the Cranberry Iron Mines in Cranberry, NC and the town of Boone, NC. The railroad fueled some much needed prosperity to the Southern Appalachians, it allowed materials to be brought in more easily, and allowed for people to more easily traverse the area.</p>
+
+		<p>Engineers would often allow locals to ride the train for free, and the sound of the whistle bouncing off the mountains made a sort of tweeting sound, which led to it being nicknamed the "Tweetsie Railroad"</p>
+
+		<p>The Railroad served Boone until 1940, when a massive flood struck the Southern Appalachians, destroying much of the rail infrastructure. The Linville Railway never reopened, and as car dependence creeped into North America, the ET&WNC fully dissapeared by the early 2000's.</p>
+
+		<p>Data by provided by <a href="http://www.etwncrrhs.org/railroadhistory.html">ET&WNC Historical Society</a></p>
+		<p>Map Produced by Jude R. Wilson</p>
+
+	</section>
+
+	<script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+  <script src="data/route.js"></script>
+
+	<script>
+
+//options to be used when creating the map
+		var options = {
+			center: [36.086863, -81.927919],
+			zoom: 17
+		}
+
+//creation of the Leaflet map
+		var map = L.map('map', options);
+
+//request to load basemap
+var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+}).addTo(map);
+
+//string content to be inserted into a tooltip
+		//var message = 'Beacon Heights!';
+
+//create a Leaflet marker, centered on the map's center.
+		//L.marker(map.getCenter())
+			//.bindTooltip(message) //bind the tooltip and message to the marker
+			//.addTo(map) // add the marker to the map`
+			//.openTooltip(); // open the tooltip
+
+      var myRoute = L.geoJson(data, {
+        filter: function(feature) {
+          if(feature.geometry.type == "LineString") {
+            return feature;
+          }
+        },
+
+        style: function(feature) {
+          return {
+            color: "#005DAA",
+            weight: 4,
+            opacity: 0.65,
+          }
+        }
+
+}).addTo(map);
+
+var myStops = L.geoJson(data, {
+  filter: function(feature) {
+    if(feature.geometry.type == "point") {
+      return feature;
+    }
+  },
+
+  onEachFeature: function(feature, layer) {
+    layer.bindTooltip(feature.properties['point']);
+  }
+})
+
+map.fitBounds(myRoute.getBounds());
+
+	</script>
+
+</body>
+
+</html>
